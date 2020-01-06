@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <style>
+        html {
+            background: rgb(124, 175, 144);
+        }
+        
+        .cell {
+            width: 35px;
+            height: 35px;
+            text-align: center;
+        }
+        
+        table {
+            background: #FFFFFF;
+            margin: 50px auto 30px;
+        }
+        
+        div {
+            padding: 5px;
+            font-family: 'Consolas';
+        }
+    </style>
+
+    <div>
+        <label for="Wrap">Nhap N</label>
+        <input type="text" class="wrap">
+        <label for="role">Nhap M</label>
+        <input type="text" class="role">
+
+    </div>
+    <div>
+        <label>Ket qua:</label>
+        <label class="ketqua" for="ketqua"></label>
+    </div>
+    <div>
+        <button class="subm" bgcolor=#CFCFCF>Submit</button>
+        <button class="reset" bgcolor=#CFCFCF>Reset</button>
+    </div>
+    <div class="board">
+
+    </div>
+
+
+
+    <script>
+        var n = 3,
+            m = 3;
+        var pointTable;
+        var turn,
+            gameOver,
+            evenly,
+            pause;
+        const ketqua = document.querySelector('.ketqua');
+
+
+        function drawChessBorad(wrap) {
+            const board = document.querySelector('.board');
+            var table = "<table boder=0px id='myTable'  >";
+            for (let i = 0; i < wrap; i++) {
+                table += "<tr>";
+                for (let j = 0; j < wrap; j++) {
+                    table += "<td class=cell pos='" + i + "," + j + "' bgcolor=#CCCCCC ></td>"
+                }
+                table += "</tr>";
+            }
+            table += "</table>";
+            board.innerHTML = table;
+        }
+
+        function creatPointTable() {
+            pointTable = new Array();
+            for (let i = 0; i < n; i++) {
+                pointTable[i] = new Array();
+                for (let j = 0; j < n; j++) {
+                    pointTable[i][j] = 0;
+                }
+            }
+            //console.log(pointTable);
+        }
+
+        function addEventCells() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => cell.addEventListener('mousedown', clickHandle));
+            cells.forEach(cell => cell.addEventListener('mouseup', function() {
+                if (gameOver) {
+                    if (turn) {
+                        ketqua.textContent = 'O Thang !!!';
+                        pause = true;
+                    } else {
+                        ketqua.textContent = 'X Thang !!!';
+                        pause = true;
+                    }
+                } else {
+                    if (evenly) {
+                        ketqua.textContent = 'Hoa Game!!!';
+                        pause = true;
+                    }
+                }
+            }));
+        }
+
+        function clickHandle() {
+            var pos = getPosCell(this);
+            var row = pos[0],
+                col = pos[1];
+            if (!pause) {
+                if ((!turn) && (pointTable[row][col] == 0)) {
+                    this.textContent = 'X';
+                    pointTable[row][col] = 1;
+                    if (checkWin(row, col)) {
+                        return;
+                    }
+
+                } else {
+                    if ((turn) && (pointTable[row][col] == 0)) {
+                        this.textContent = 'O';
+                        pointTable[row][col] = 2;
+                        if (checkWin(row, col)) {
+                            return;
+                        }
+                    }
+
+                }
+                turn = !turn;
+            }
+        }
+
+        function checkWin(row, colum) {
+            var pointRow = 1,
+                pointColum = 1,
+                pointCheo1 = 1,
+                pointCheo2 = 1;
+            // check theo row
+            for (let j = colum + 1; j < n; j++) {
+                if (pointTable[row][j] == pointTable[row][colum]) {
+                    pointRow++;
+                } else break;
+            }
+            for (let j = colum - 1; j >= 0; j--) {
+                if (pointTable[row][j] == pointTable[row][colum]) {
+                    pointRow++;
+                } else break;
+            }
+            if (pointRow >= m) {
+                gameOver = true;
+                return true;
+            }
+            //check theo colum
+            for (let i = row + 1; i < n; i++) {
+                if (pointTable[i][colum] == pointTable[row][colum]) {
+                    pointColum++;
+                } else break;
+            }
+            for (let i = row - 1; i >= 0; i--) {
+                if (pointTable[i][colum] == pointTable[row][colum]) {
+                    pointColum++;
+                } else break;
+            }
+            if (pointColum >= m) {
+                gameOver = true;
+                return true;
+            }
+            //check theo duong cheo
+            var i = 1;
+
+            while ((row + i) < n && (colum + i) < n) {
+                if (pointTable[row + i][colum + i] == pointTable[row][colum]) {
+                    pointCheo1++;
+                    i++;
+                } else break;
+            }
+            i = 1;
+            while ((row - i) >= 0 && (colum - i) >= 0) {
+                if (pointTable[row - i][colum - i] == pointTable[row][colum]) {
+                    pointCheo1++;
+                    i++;
+                } else break;
+            }
+            if (pointCheo1 >= m) {
+                gameOver = true;
+                return true;
+            }
+            //check theo duong cheo
+            i = 1;
+            while ((row - i) >= 0 && (colum + i) < n) {
+                if (pointTable[row - i][colum + i] == pointTable[row][colum]) {
+                    pointCheo2++;
+                    i++;
+                } else break;
+            }
+            i = 1;
+            while ((row + i) < n && (colum - i) >= 0) {
+                if (pointTable[row + i][colum - i] == pointTable[row][colum]) {
+                    pointCheo2++;
+                    i++;
+                } else break;
+            }
+            if (pointCheo2 >= m) {
+                gameOver = true;
+                return true;
+            }
+            var flag = true;
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    if (pointTable[i][j] == 0) flag = false;
+                }
+            }
+            if (flag) {
+                evenly = true;
+            } else evenly = false;
+            return false;
+        }
+
+        function getPosCell(cell) {
+            var posistion = cell.getAttribute("pos").toString();
+            var arrPos = posistion.split(",");
+            var row = parseInt(arrPos[0]),
+                colum = parseInt(arrPos[1]);
+            var PosCell = [row, colum];
+            return PosCell;
+        }
+
+        function resetGame() {
+            const cells = document.querySelectorAll('.cell');
+            for (let i = 0; i < cells.length; i++) {
+                cells[i].textContent = '';
+            }
+        }
+
+        function startGame() {
+            turn = false;
+            gameOver = false;
+            evenly = false;
+            pause = false;
+            resetGame();
+            creatPointTable();
+            addEventCells();
+        }
+        drawChessBorad(3);
+        startGame();
+
+        const reset = document.querySelector('.reset');
+        const subm = document.querySelector('.subm');
+        const wrap = document.querySelector('.wrap');
+        const role = document.querySelector('.role');
+        reset.addEventListener('click', resetHandle);
+
+        function resetHandle() {
+            wrap.value = '';
+            role.value = '';
+            ketqua.textContent = '';
+            pause = false;
+            startGame();
+        }
+        subm.addEventListener('click', submitHandle);
+
+        function submitHandle(e) {
+            n = parseInt(wrap.value);
+            m = parseInt(role.value);
+            if (m > n) {
+                wrap.value = '';
+                role.value = '';
+                alert('nhap lai !!!');
+
+            }
+            var table = document.getElementById('myTable');
+            table.remove();
+            drawChessBorad(n);
+            startGame();
+        }
+    </script>
+</body>
+
+</html>

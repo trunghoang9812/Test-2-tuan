@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <style>
+        html {
+            background: rgb(124, 175, 144);
+        }
+        
+        div {
+            padding: 5px;
+            font-family: 'Consolas';
+        }
+        
+        .cell {
+            width: 20px;
+            height: 20px;
+            text-align: center;
+        }
+        
+        .cellHead {
+            width: 20px;
+            height: 20px;
+            background-color: aqua;
+        }
+        
+        table {
+            width: 90%;
+            padding: 1;
+            border: 0px;
+        }
+        /* thead {
+            margin: auto;
+            width: auto;
+            height: fit-content;
+            position: fixed;
+            margin: 0px auto;
+           
+        } */
+    </style>
+
+    <table id="myTable">
+
+    </table>
+    <div>
+        <label for="Wrap">Nhap N</label>
+        <input type="text" class="Row">
+        <label for="role">Nhap M</label>
+        <input type="text" class="Colum">
+
+    </div>
+    <div>
+        <button class="subm" bgcolor=#CFCFCF>Submit</button>
+    </div>
+    <script>
+        var n = 100,
+            m = 25;
+        const subm = document.querySelector('.subm');
+        const row = document.querySelector('.Row');
+        const colum = document.querySelector('.Colum');
+        var ArrValue;
+        var max = 1000,
+            min = 1;
+        subm.addEventListener('click', submHhandle);
+
+        function submHhandle() {
+            n = parseInt(row.value);
+            m = parseInt(colum.value);
+            drawTable(n, m);
+            fillTable();
+        }
+
+        function drawTable(n, m) {
+            var table = '';
+            const board = document.getElementById('myTable');
+            table += "<thead class='head'>";
+            table += "<tr>";
+            for (let i = 0; i < m; i++) {
+                table += "<th class=cellHead cell= '" + 0 + "," + i + "' >" + i + "</th>";
+            }
+            table += "</tr>";
+            table += "</thead>";
+            table += "<tbody class='body'>";
+
+            for (let i = 1; i < n; i++) {
+                table += "<tr>";
+                for (let j = 0; j < m; j++) {
+                    table += "<td class='cell " + j + "'   cell= '" + i + "," + j + "' bgcolor= #fff></td>";
+                }
+                table += "</tr>";
+            }
+            table += "</tbody>";
+            board.innerHTML = table;
+        }
+
+        function getPosCell(cell) {
+            var posistion = cell.getAttribute("cell").toString();
+            var arrPos = posistion.split(",");
+            var row = parseInt(arrPos[0]),
+                colum = parseInt(arrPos[1]);
+            var PosCell = [row, colum];
+            return PosCell;
+        }
+
+        function fillTable() {
+            const cells = document.querySelectorAll('.cell');
+            ArrValue = new Array();
+            for (let i = 0; i < n; i++) {
+                ArrValue[i] = new Array();
+            }
+            for (let i = 0; i < cells.length; i++) {
+                var pos = getPosCell(cells[i]);
+                var r = pos[0],
+                    c = pos[1];
+
+                var value = Math.floor(Math.random() * (max - min) + min);
+                ArrValue[r][c] = value;
+                cells[i].textContent = value.toString();
+            }
+            //console.log(cells);
+        }
+        drawTable(n, m);
+        fillTable();
+        const cellHeads = document.querySelectorAll('.cellHead');
+        cellHeads.forEach(cellHead => cellHead.addEventListener('click', short))
+
+        function short() {
+            var pos = getPosCell(this)
+            var id = '.' + pos[1].toString();
+            const Colum = document.querySelectorAll('.cell14');
+            var arrCells = new Array();
+            console.log(Colum);
+        }
+        //console.log(header);
+    </script>
+</body>
+
+</html>

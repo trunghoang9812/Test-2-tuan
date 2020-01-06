@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <style>
+        canvas {
+            background: #cCFFCC;
+        }
+        
+        html {
+            margin: 50px 400px 10px;
+        }
+        
+        button {
+            background-color: aqua;
+            margin-left: 550px;
+        }
+    </style>
+
+    <div>
+        <canvas id="myCanvas" width="600" height="600"></canvas>
+    </div>
+    <div>
+        <button class="reset" value="Reset">Reset</button>
+    </div>
+    <script>
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+        var width = canvas.width,
+            height = canvas.height;
+        var snake = [];
+        var prey;
+        var score;
+        var gameOver;
+        var direction;
+        var directionLast;
+        var unit = 15,
+            dx = unit,
+            dy = unit;
+
+        function start() {
+
+            score = 0;
+            gameOver = false;
+            directionLast = 'right';
+            direction = 'right';
+            creatPrey();
+            var snakeSize = 2;
+            snake.push({
+                x: 20,
+                y: 20
+            }, {
+                x: 21,
+                y: 20
+            })
+            var game_loop = setInterval(draw, 700);
+        }
+
+        function drawOverPanel() {
+            context.beginPath();
+            context.rect(200, 200, 200, 200);
+            context.fillStyle = '#FFC';
+            context.fill();
+            context.strokeText("Score:" + `${score}`, 220, 220, 160);
+            context.closePath();
+        }
+
+        function drawCell(x, y) {
+            context.beginPath();
+            context.rect(x * unit, y * unit, unit, unit);
+            context.fillStyle = '#008300';
+            context.fill();
+            context.closePath();
+
+        }
+
+        function creatPrey() {
+            var maxX = Math.floor(canvas.width / unit),
+                maxY = Math.floor(canvas.height / unit);
+            var preyX = Math.floor(Math.random() * maxX),
+                preyY = Math.floor(Math.random() * maxY)
+            for (let i = 0; i < snake.length; i++) {
+                if (snake[i] == prey) {
+                    creatPrey();
+                }
+            }
+            prey = {
+                x: preyX,
+                y: preyY
+            };
+        }
+
+        function checkTouch(pos) {
+            for (let i = 0; i < snake.length; i++) {
+                if (pos.x == snake[i].x && pos.y == snake[i].y)
+                    return true;
+            }
+            return false;
+        }
+
+        function draw() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            if (gameOver) {
+                drawOverPanel();
+                return;
+            }
+            //Chuyen huong tu right->up
+            if ((direction == 'up' && directionLast == 'right') || (direction == 'up' && directionLast == 'up')) {
+                var newPos = {
+                    x: snake[snake.length - 1].x,
+                    y: snake[snake.length - 1].y - 1
+                }
+                if (checkTouch(newPos)) {
+                    gameOver = true;
+                } else {
+                    if (newPos.x == prey.x && newPos.y == prey.y) {
+                        snake.push(newPos);
+                        creatPrey();
+                        directionLast = 'up';
+                        score++;
+                    } else {
+                        snake.push(newPos);
+                        snake.splice(0, 1);
+                        directionLast = 'up';
+                    }
+                }
+
+
+            }
+            //Chuyen huong tu up->right
+            if ((direction == 'right' && directionLast == 'up') || (direction == 'right' && directionLast == 'right')) {
+                var newPos = {
+                    x: snake[snake.length - 1].x + 1,
+                    y: snake[snake.length - 1].y
+                }
+                if (checkTouch(newPos)) {
+                    gameOver = true;
+                } else {
+                    if (newPos.x == prey.x && newPos.y == prey.y) {
+                        snake.push(newPos);
+                        creatPrey();
+                        directionLast = 'right';
+                        score++;
+                    } else {
+                        snake.push(newPos);
+                        snake.splice(0, 1);
+                        directionLast = 'right';
+                    }
+                }
+
+            }
+            //Chuyen huong tu up->left
+            if ((direction == 'left' && directionLast == 'up') || (direction == 'left' && directionLast == 'left')) {
+                var newPos = {
+                    x: snake[snake.length - 1].x - 1,
+                    y: snake[snake.length - 1].y
+                }
+                if (checkTouch(newPos)) {
+                    gameOver = true;
+                    return;
+                } else {
+                    if (newPos.x == prey.x && newPos.y == prey.y) {
+                        snake.push(newPos);
+                        creatPrey();
+                        directionLast = 'left';
+                        score++;
+                    } else {
+                        snake.push(newPos);
+                        snake.splice(0, 1);
+                        directionLast = 'left';
+                    }
+                }
+
+            }
+            //Chuyen huong tu right->down
+            if ((direction == 'down' && directionLast == 'right') || (direction == 'down' && directionLast == 'down')) {
+                var newPos = {
+                    x: snake[snake.length - 1].x,
+                    y: snake[snake.length - 1].y + 1
+                }
+                if (checkTouch(newPos)) {
+                    gameOver = true;
+                    return;
+                } else {
+                    if (newPos.x == prey.x && newPos.y == prey.y) {
+                        snake.push(newPos);
+                        creatPrey();
+                        directionLast = 'down';
+                        score++;
+                    } else {
+                        snake.push(newPos);
+                        snake.splice(0, 1);
+                        directionLast = 'down';
+                    }
+                }
+
+            }
+            //Chuyen huong tu left->up
+            if (direction == 'up' && directionLast == 'left') {
+                var newPos = {
+                    x: snake[snake.length - 1].x,
+                    y: snake[snake.length - 1].y - 1
+                }
+                if (checkTouch(newPos)) {
+                    gameOver = true;
+                    return;
+                } else {
+                    if (newPos.x == prey.x && newPos.y == prey.y) {
+                        snake.push(newPos);
+                        creatPrey();
+                        directionLast = 'up';
+                        score++;
+                    } else {
+                        snake.push(newPos);
+                        snake.splice(0, 1);
+                        directionLast = 'up';
+                    }
+                }
+
+            }
+            //Chuyen huong tu left->down
+            if (direction == 'down' && directionLast == 'left') {
+                var newPos = {
+                    x: snake[snake.length - 1].x,
+                    y: snake[snake.length - 1].y + 1
+                }
+                if (checkTouch(newPos)) {
+                    gameOver = true;
+                    return;
+                } else {
+                    if (newPos.x == prey.x && newPos.y == prey.y) {
+                        snake.push(newPos);
+                        creatPrey();
+                        directionLast = 'down';
+                        score++;
+                    } else {
+                        snake.push(newPos);
+                        snake.splice(0, 1);
+                        directionLast = 'down';
+                    }
+                }
+
+
+            }
+            //Chuyen huong tu down->right
+            if (direction == 'right' && directionLast == 'down') {
+                var newPos = {
+                    x: snake[snake.length - 1].x + 1,
+                    y: snake[snake.length - 1].y
+                }
+                if (checkTouch(newPos)) {
+                    gameOver = true;
+                    return;
+                } else {
+                    if (newPos.x == prey.x && newPos.y == prey.y) {
+                        snake.push(newPos);
+                        creatPrey();
+                        directionLast = 'right';
+                        score++;
+                    } else {
+                        snake.push(newPos);
+                        snake.splice(0, 1);
+                        directionLast = 'right';
+                    }
+                }
+
+            }
+            //Chuyen huong tu down->left
+            if (direction == 'left' && directionLast == 'down') {
+                var newPos = {
+                    x: snake[snake.length - 1].x - 1,
+                    y: snake[snake.length - 1].y
+                }
+                if (checkTouch(newPos)) {
+                    gameOver = true;
+                    return;
+                } else {
+                    if (newPos.x == prey.x && newPos.y == prey.y) {
+                        snake.push(newPos);
+                        creatPrey();
+                        directionLast = 'left';
+                        score++;
+                    } else {
+                        snake.push(newPos);
+                        snake.splice(0, 1);
+                        directionLast = 'left';
+                    }
+                }
+
+            }
+            //Check dung tuong
+            if (snake[snake.length - 1].x >= (canvas.width / unit)) {
+                gameOver = true;
+                return;
+            }
+            if (snake[snake.length - 1].x <= 0) {
+                gameOver = true;
+                return;
+            }
+            if (snake[snake.length - 1].y >= (canvas.height / unit)) {
+                gameOver = true;
+                return;
+            }
+            if (snake[snake.length - 1].y <= 0) {
+                gameOver = true;
+                return;
+            }
+            //draw Snake
+            for (let i = 0; i < snake.length; i++) {
+                drawCell(snake[i].x, snake[i].y);
+            }
+            //drwa Prey
+            drawCell(prey.x, prey.y);
+
+
+        }
+
+        function move(e) {
+            if (e.key == "ArrowLeft" && direction != 'right') {
+                direction = 'left';
+            } else if (e.key == "ArrowRight" && direction != 'left') {
+                direction = 'right';
+            } else if (e.key == "ArrowDown" && direction != 'up') {
+                direction = 'down';
+            } else if (e.key == "ArrowUp" && direction != 'down') {
+                direction = 'up';
+            }
+        }
+        document.addEventListener('keydown', move);
+        const reset = document.querySelector('.reset');
+        reset.addEventListener('click', clickHandle);
+
+        function clickHandle() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            gameOver = false;
+        }
+        start();
+    </script>
+</body>
+
+</html>
