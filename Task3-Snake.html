@@ -44,23 +44,22 @@
         var unit = 15,
             dx = unit,
             dy = unit;
+        var Interval;
 
         function start() {
-
+            snake.splice(0, snake.length);
             score = 0;
             gameOver = false;
             directionLast = 'right';
             direction = 'right';
             creatPrey();
-            var snakeSize = 2;
+            var snakeSize = 1;
             snake.push({
                 x: 20,
                 y: 20
-            }, {
-                x: 21,
-                y: 20
             })
-            var game_loop = setInterval(draw, 700);
+
+            Interval = setInterval(draw, 1000);
         }
 
         function drawOverPanel() {
@@ -68,7 +67,13 @@
             context.rect(200, 200, 200, 200);
             context.fillStyle = '#FFC';
             context.fill();
-            context.strokeText("Score:" + `${score}`, 220, 220, 160);
+            context.textAlign = 'center';
+            context.font = '25px sans-serif';
+
+            context.strokeText("Score:" + `${score}`, 290, 290, 200);
+            context.strokeText("GameOver", 290, 350, 200);
+
+
             context.closePath();
         }
 
@@ -300,7 +305,7 @@
                 gameOver = true;
                 return;
             }
-            if (snake[snake.length - 1].x <= 0) {
+            if (snake[snake.length - 1].x < 0) {
                 gameOver = true;
                 return;
             }
@@ -308,7 +313,7 @@
                 gameOver = true;
                 return;
             }
-            if (snake[snake.length - 1].y <= 0) {
+            if (snake[snake.length - 1].y < 0) {
                 gameOver = true;
                 return;
             }
@@ -339,7 +344,8 @@
 
         function clickHandle() {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            gameOver = false;
+            clearInterval(Interval);
+            start();
         }
         start();
     </script>
